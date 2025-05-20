@@ -22,7 +22,6 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    private lateinit var carl: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,10 +54,11 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.new_task_menu -> {
-                carl.launch(Intent(this, TaskActivity::class.java))
+                val intent = Intent(this, TaskActivity::class.java)
+                startActivity(intent)
                 true
             }
-            else -> { false }
+            else -> false
         }
     }
 
