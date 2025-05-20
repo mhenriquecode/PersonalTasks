@@ -34,6 +34,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Data (ex: 21/05/2025)"
+        android:focusable="false"
+        android:inputType="none"
         app:layout_constraintTop_toBottomOf="@id/etDescription"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

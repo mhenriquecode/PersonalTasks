@@ -2,7 +2,12 @@ package com.example.personaltasks.view
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
+import android.app.DatePickerDialog
+import android.content.Intent
 import com.example.personaltasks.databinding.ActivityTaskBinding
+import com.example.personaltasks.model.Task
+import java.util.Calendar
 
 class TaskActivity : AppCompatActivity() {
 
@@ -11,6 +16,22 @@ class TaskActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        // DatePicker ao clicar no campo de data
+        binding.etDeadline.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                val formattedDate = "%02d/%02d/%04d".format(selectedDay, selectedMonth + 1, selectedYear)
+                binding.etDeadline.setText(formattedDate)
+            }, year, month, day)
+
+            datePicker.show()
+        }
+
     }
 
 }
