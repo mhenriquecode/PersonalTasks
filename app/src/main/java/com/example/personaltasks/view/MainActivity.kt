@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(amb.root)
+        setSupportActionBar(amb.toolbar)
 
         // lista de fake tasks
         val taskList = listOf(
