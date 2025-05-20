@@ -32,6 +32,21 @@ class TaskActivity : AppCompatActivity() {
             datePicker.show()
         }
 
+        binding.btnSave.setOnClickListener {
+            val title = binding.etTitle.text.toString()
+            val description = binding.etDescription.text.toString()
+            val deadline = binding.etDeadline.text.toString()
+
+            val resultIntent = Intent().apply {
+                putExtra("TASK_TITLE", title)
+                putExtra("TASK_DESCRIPTION", description)
+                putExtra("TASK_DEADLINE", deadline)
+            }
+
+            setResult(RESULT_OK, resultIntent)
+            finish()
+        }
+
     }
 
 }
