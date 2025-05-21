@@ -102,6 +102,8 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     }
 
     override fun onRemoveTaskMenuItemClick(position: Int) {
+        taskList.removeAt(position)
+        taskAdapter.notifyItemRemoved(position)
     }
 
     override fun onDetailsTaskMenuItemClick(position: Int) {
