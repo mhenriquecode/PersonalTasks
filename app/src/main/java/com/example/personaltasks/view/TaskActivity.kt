@@ -80,9 +80,12 @@ class TaskActivity : AppCompatActivity() {
         }
 
         // botão cancelar
-        binding.btnCancel.setOnClickListener{
-            setResult(Activity.RESULT_CANCELED)
-            finish()
+        with(binding){
+            btnCancel.setOnClickListener{
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }
         }
+
     }
 }
