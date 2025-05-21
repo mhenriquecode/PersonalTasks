@@ -34,12 +34,13 @@ class TaskActivity : AppCompatActivity() {
                 etTitle.setText(task.title)
                 etDescription.setText(task.description)
                 etDeadline.setText(task.deadline)
-
+                etDetails.setText(task.details)
                 val isViewOnly = intent.getBooleanExtra(EXTRA_VIEW_TASK, false)
                 if (isViewOnly) {
                     etTitle.isEnabled = false
                     etDescription.isEnabled = false
                     etDeadline.isEnabled = false
+                    etDetails.isEnabled = false
                     btnSave.visibility = View.GONE
                 }
             }
@@ -64,7 +65,8 @@ class TaskActivity : AppCompatActivity() {
                     receivedTask?.id ?: hashCode(),
                     etTitle.text.toString(),
                     etDescription.text.toString(),
-                    etDeadline.text.toString()
+                    etDeadline.text.toString(),
+                    etDetails.text.toString()
                 )
                 val resultIntent = Intent().apply {
                     putExtra(EXTRA_TASK, task)
