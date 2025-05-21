@@ -1,6 +1,7 @@
 package com.example.personaltasks.view
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.personaltasks.R
 import com.example.personaltasks.adapter.TaskAdapter
 import com.example.personaltasks.databinding.ActivityMainBinding
+import com.example.personaltasks.model.Constant.EXTRA_TASK
 import com.example.personaltasks.model.Task
 
 class MainActivity : AppCompatActivity() {
@@ -41,13 +43,14 @@ class MainActivity : AppCompatActivity() {
         ) { result ->
             if (result.resultCode == RESULT_OK) {
                 val data = result.data
-                data?.let {
-                    val title = it.getStringExtra("TASK_TITLE") ?: ""
-                    val description = it.getStringExtra("TASK_DESCRIPTION") ?: ""
-                    val deadline = it.getStringExtra("TASK_DEADLINE") ?: ""
+                val receivedTask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    data?.getParcelableExtra(EXTRA_TASK, Task::class.java)
+                } else {
+                    data?.getParcelableExtra<Task>(EXTRA_TASK)
+                }
 
-                    val newTask = Task(title, description, deadline)
-                    taskList.add(newTask)
+                receivedTask?.let { task ->
+                    taskList.add(task)
                     taskAdapter.notifyItemInserted(taskList.size - 1)
                 }
             }
