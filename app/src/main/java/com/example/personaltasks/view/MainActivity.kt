@@ -107,6 +107,10 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     }
 
     override fun onDetailsTaskMenuItemClick(position: Int) {
+        val intent = Intent(this, TaskActivity::class.java)
+        intent.putExtra(EXTRA_TASK, taskList[position])
+        intent.putExtra(EXTRA_VIEW_TASK, true)
+        startActivity(intent)
     }
 
 }
