@@ -85,14 +85,6 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         }
     }
 
-    // Apenas vizualizar a task
-    override fun onTaskClick(position: Int) {
-        val intent = Intent(this, TaskActivity::class.java)
-        intent.putExtra(EXTRA_TASK, taskList[position])
-        intent.putExtra(EXTRA_VIEW_TASK, true)
-        startActivity(intent)
-    }
-
     override fun onEditTaskMenuItemClick(position: Int) {
         val intent = Intent(this, TaskActivity::class.java).apply {
             putExtra(EXTRA_TASK, taskList[position])

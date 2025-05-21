@@ -43,11 +43,6 @@ RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
                     true
                 }
             }
-
-            // Clique curto
-            binding.root.setOnClickListener {
-                onTaskClickListener.onTaskClick(adapterPosition)
-            }
         }
     }
 
