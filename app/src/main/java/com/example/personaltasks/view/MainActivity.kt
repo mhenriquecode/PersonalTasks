@@ -16,7 +16,7 @@ import com.example.personaltasks.databinding.ActivityMainBinding
 import com.example.personaltasks.model.Constant.EXTRA_TASK
 import com.example.personaltasks.model.Task
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
     private val amb: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -70,6 +70,17 @@ class MainActivity : AppCompatActivity() {
             }
             else -> false
         }
+    }
+    override fun onTaskClick(position: Int) {
+    }
+
+    override fun onEditTaskMenuItemClick(position: Int) {
+    }
+
+    override fun onRemoveTaskMenuItemClick(position: Int) {
+    }
+
+    override fun onDetailsTaskMenuItemClick(position: Int) {
     }
 
 }
