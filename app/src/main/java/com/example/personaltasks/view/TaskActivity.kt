@@ -44,7 +44,7 @@ class TaskActivity : AppCompatActivity() {
                 }
             }
         }
-
+        // data
         with(binding) {
             etDeadline.setOnClickListener {
                 val calendar = Calendar.getInstance()
@@ -56,23 +56,28 @@ class TaskActivity : AppCompatActivity() {
                     etDeadline.setText(String.format("%02d/%02d/%04d", d, m + 1, y))
                 }, year, month, day).show()
             }
-
-            with(binding) {
-                btnSave.setOnClickListener {
-                    val task = Task(
-                        receivedTask?.id ?: hashCode(),
-                        etTitle.text.toString(),
-                        etDescription.text.toString(),
-                        etDeadline.text.toString()
-                    )
-                    val resultIntent = Intent().apply {
-                        putExtra(EXTRA_TASK, task)
-                    }
-                    setResult(Activity.RESULT_OK, resultIntent)
-                    finish()
+        }
+        // botão salvar
+        with(binding) {
+            btnSave.setOnClickListener {
+                val task = Task(
+                    receivedTask?.id ?: hashCode(),
+                    etTitle.text.toString(),
+                    etDescription.text.toString(),
+                    etDeadline.text.toString()
+                )
+                val resultIntent = Intent().apply {
+                    putExtra(EXTRA_TASK, task)
                 }
+                setResult(Activity.RESULT_OK, resultIntent)
+                finish()
             }
+        }
 
+        // botão cancelar
+        binding.btnCancel.setOnClickListener{
+            setResult(Activity.RESULT_CANCELED)
+            finish()
         }
     }
 }
