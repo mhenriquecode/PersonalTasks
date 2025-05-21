@@ -5,48 +5,74 @@ import androidx.appcompat.app.AppCompatActivity
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.os.Build
+import android.view.View
 import com.example.personaltasks.databinding.ActivityTaskBinding
+import com.example.personaltasks.model.Constant.EXTRA_TASK
+import com.example.personaltasks.model.Constant.EXTRA_VIEW_TASK
 import com.example.personaltasks.model.Task
 import java.util.Calendar
 
 class TaskActivity : AppCompatActivity() {
 
-    private val binding by lazy { ActivityTaskBinding.inflate(layoutInflater) }
+    private val binding: ActivityTaskBinding by lazy {
+        ActivityTaskBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        // DatePicker ao clicar no campo de data
-        binding.etDeadline.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-            val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-                val formattedDate = "%02d/%02d/%04d".format(selectedDay, selectedMonth + 1, selectedYear)
-                binding.etDeadline.setText(formattedDate)
-            }, year, month, day)
-
-            datePicker.show()
+        val receivedTask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(EXTRA_TASK, Task::class.java)
+        } else {
+            intent.getParcelableExtra<Task>(EXTRA_TASK)
         }
 
-        binding.btnSave.setOnClickListener {
-            val title = binding.etTitle.text.toString()
-            val description = binding.etDescription.text.toString()
-            val deadline = binding.etDeadline.text.toString()
+        receivedTask?.let { task ->
+            with(binding) {
+                etTitle.setText(task.title)
+                etDescription.setText(task.description)
+                etDeadline.setText(task.deadline)
 
-            val resultIntent = Intent().apply {
-                putExtra("TASK_TITLE", title)
-                putExtra("TASK_DESCRIPTION", description)
-                putExtra("TASK_DEADLINE", deadline)
+                val isViewOnly = intent.getBooleanExtra(EXTRA_VIEW_TASK, false)
+                if (isViewOnly) {
+                    etTitle.isEnabled = false
+                    etDescription.isEnabled = false
+                    etDeadline.isEnabled = false
+                    btnSave.visibility = View.GONE
+                }
+            }
+        }
+
+        with(binding) {
+            etDeadline.setOnClickListener {
+                val calendar = Calendar.getInstance()
+                val year = calendar.get(Calendar.YEAR)
+                val month = calendar.get(Calendar.MONTH)
+                val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+                DatePickerDialog(this@TaskActivity, { _, y, m, d ->
+                    etDeadline.setText(String.format("%02d/%02d/%04d", d, m + 1, y))
+                }, year, month, day).show()
             }
 
-            setResult(RESULT_OK, resultIntent)
-            finish()
+            with(binding) {
+                btnSave.setOnClickListener {
+                    val task = Task(
+                        receivedTask?.id ?: hashCode(),
+                        etTitle.text.toString(),
+                        etDescription.text.toString(),
+                        etDeadline.text.toString()
+                    )
+                    val resultIntent = Intent().apply {
+                        putExtra(EXTRA_TASK, task)
+                    }
+                    setResult(Activity.RESULT_OK, resultIntent)
+                    finish()
+                }
+            }
+
         }
-
     }
-
 }
