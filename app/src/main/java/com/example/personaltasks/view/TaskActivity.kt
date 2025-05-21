@@ -9,6 +9,7 @@ import android.os.Build
 import android.view.View
 import com.example.personaltasks.databinding.ActivityTaskBinding
 import com.example.personaltasks.model.Constant.EXTRA_TASK
+import com.example.personaltasks.model.Constant.EXTRA_TASK_POSITION
 import com.example.personaltasks.model.Constant.EXTRA_VIEW_TASK
 import com.example.personaltasks.model.Task
 import java.util.Calendar
@@ -68,8 +69,10 @@ class TaskActivity : AppCompatActivity() {
                     etDeadline.text.toString(),
                     etDetails.text.toString()
                 )
+                val position = intent.getIntExtra(EXTRA_TASK_POSITION, -1)
                 val resultIntent = Intent().apply {
                     putExtra(EXTRA_TASK, task)
+                    putExtra(EXTRA_TASK_POSITION, position)
                 }
                 setResult(Activity.RESULT_OK, resultIntent)
                 finish()

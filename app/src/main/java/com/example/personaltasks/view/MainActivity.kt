@@ -14,6 +14,7 @@ import com.example.personaltasks.R
 import com.example.personaltasks.adapter.TaskAdapter
 import com.example.personaltasks.databinding.ActivityMainBinding
 import com.example.personaltasks.model.Constant.EXTRA_TASK
+import com.example.personaltasks.model.Constant.EXTRA_TASK_POSITION
 import com.example.personaltasks.model.Constant.EXTRA_VIEW_TASK
 import com.example.personaltasks.model.Task
 
@@ -50,12 +51,23 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                     data?.getParcelableExtra<Task>(EXTRA_TASK)
                 }
 
+                // recupera a posição da intent
+                val position = data?.getIntExtra(EXTRA_TASK_POSITION, -1) ?: -1
+
                 receivedTask?.let { task ->
-                    taskList.add(task)
-                    taskAdapter.notifyItemInserted(taskList.size - 1)
+                    if (position != -1) {
+                        // atualiza uma tarefa
+                        taskList[position] = task
+                        taskAdapter.notifyItemChanged(position)
+                    } else {
+                        // adiciona uma nova tarefa
+                        taskList.add(task)
+                        taskAdapter.notifyItemInserted(taskList.size - 1)
+                    }
                 }
             }
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -82,6 +94,11 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     }
 
     override fun onEditTaskMenuItemClick(position: Int) {
+        val intent = Intent(this, TaskActivity::class.java).apply {
+            putExtra(EXTRA_TASK, taskList[position])
+            putExtra(EXTRA_TASK_POSITION, position)
+        }
+        newTaskLauncher.launch(intent)
     }
 
     override fun onRemoveTaskMenuItemClick(position: Int) {
