@@ -14,6 +14,7 @@ import com.example.personaltasks.R
 import com.example.personaltasks.adapter.TaskAdapter
 import com.example.personaltasks.databinding.ActivityMainBinding
 import com.example.personaltasks.model.Constant.EXTRA_TASK
+import com.example.personaltasks.model.Constant.EXTRA_VIEW_TASK
 import com.example.personaltasks.model.Task
 
 class MainActivity : AppCompatActivity(), OnTaskClickListener {
@@ -71,7 +72,13 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
             else -> false
         }
     }
+
+    // Apenas vizualizar a task
     override fun onTaskClick(position: Int) {
+        val intent = Intent(this, TaskActivity::class.java)
+        intent.putExtra(EXTRA_TASK, taskList[position])
+        intent.putExtra(EXTRA_VIEW_TASK, true)
+        startActivity(intent)
     }
 
     override fun onEditTaskMenuItemClick(position: Int) {
