@@ -2,12 +2,17 @@ package com.example.personaltasks.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.personaltasks.R
 import com.example.personaltasks.databinding.TaskItemBinding
 import com.example.personaltasks.model.Task
+import com.example.personaltasks.view.OnTaskClickListener
 
 // passando uma lista de tasks
-class TaskAdapter(private val taskList: List<Task>) :
+class TaskAdapter(private val taskList: List<Task>,
+                  private val onTaskClickListener: OnTaskClickListener
+) :
 RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
 
     // criando viewHolder interno ao Adapter para pegar as task items
@@ -17,6 +22,32 @@ RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
             binding.txtTitle.text = task.title
             binding.txtDescription.text = task.description
             binding.txtDate.text = task.deadline
+        }
+        init {
+            // Clique longo → mostra menu de contexto
+            binding.root.setOnCreateContextMenuListener { menu, _, _ ->
+                (onTaskClickListener as AppCompatActivity).menuInflater.inflate(R.menu.context_menu, menu)
+
+                menu.findItem(R.id.edit_task).setOnMenuItemClickListener {
+                    onTaskClickListener.onEditTaskMenuItemClick(adapterPosition)
+                    true
+                }
+
+                menu.findItem(R.id.remove_task).setOnMenuItemClickListener {
+                    onTaskClickListener.onRemoveTaskMenuItemClick(adapterPosition)
+                    true
+                }
+
+                menu.findItem(R.id.details_task).setOnMenuItemClickListener {
+                    onTaskClickListener.onDetailsTaskMenuItemClick(adapterPosition)
+                    true
+                }
+            }
+
+            // Clique curto
+            binding.root.setOnClickListener {
+                onTaskClickListener.onTaskClick(adapterPosition)
+            }
         }
     }
 

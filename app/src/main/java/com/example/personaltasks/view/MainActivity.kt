@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         setSupportActionBar(amb.toolbar)
 
         // Inicializa o adapter com a lista mutável
-        taskAdapter = TaskAdapter(taskList)
+        taskAdapter = TaskAdapter(taskList, this)
         amb.rvTaks.layoutManager = LinearLayoutManager(this)
         amb.rvTaks.adapter = taskAdapter
 
