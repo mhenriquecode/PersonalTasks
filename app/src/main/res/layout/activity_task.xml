@@ -1,79 +1,100 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/newTask"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#1B1B3A"
+    android:padding="16dp"
     tools:context=".view.TaskActivity">
 
-    <!-- titulo new task -->
+    <!-- Título -->
     <EditText
         android:id="@+id/etTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Título"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#AAAAAA"
+        android:background="@drawable/bg_edittext_dark"
+        android:padding="12dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- descrição new task -->
+    <!-- Descrição -->
     <EditText
         android:id="@+id/etDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Descrição"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#AAAAAA"
+        android:background="@drawable/bg_edittext_dark"
+        android:padding="12dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@id/etTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- data new task  -->
+    <!-- Data -->
     <EditText
         android:id="@+id/etDeadline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Data (ex: 21/05/2025)"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#AAAAAA"
         android:focusable="false"
         android:inputType="none"
+        android:background="@drawable/bg_edittext_dark"
+        android:padding="12dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@id/etDescription"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- detalhes da tarefa -->
+    <!-- Detalhes -->
     <EditText
         android:id="@+id/etDetails"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Detalhes (opcional)"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#AAAAAA"
+        android:background="@drawable/bg_edittext_dark"
+        android:padding="12dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@id/etDeadline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Botão Cancelar -->
+    <!-- Cancelar -->
     <Button
         android:id="@+id/btnCancel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Cancelar"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#444477"
         app:layout_constraintTop_toBottomOf="@id/etDetails"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btnSave"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"/>
+        android:layout_marginEnd="10dp"/>
 
-    <!-- Botão Salvar -->
+    <!-- Salvar -->
     <Button
         android:id="@+id/btnSave"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Salvar"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FF4C97"
         app:layout_constraintTop_toBottomOf="@id/etDetails"
         app:layout_constraintStart_toEndOf="@id/btnCancel"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"/>
+        android:layout_marginStart="10dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

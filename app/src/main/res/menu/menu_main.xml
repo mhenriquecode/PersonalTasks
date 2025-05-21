@@ -4,6 +4,6 @@
     <item
         android:id="@+id/new_task_menu"
         android:title="Nova Tarefa"
-        android:icon="@android:drawable/ic_input_add"
+        android:icon="@drawable/ic_add_pink"
         app:showAsAction="ifRoom|withText" />
 </menu>
