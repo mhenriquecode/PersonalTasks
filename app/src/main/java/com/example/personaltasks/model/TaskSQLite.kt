@@ -64,7 +64,12 @@ class TaskSqlite(context: Context): TaskDao {
 
     override fun retrieveTasks(): MutableList<Task> {
         val taskList = mutableListOf<Task>()
-        val cursor = taskDatabase.rawQuery("SELECT * FROM $TASK_TABLE", null)
+        // Ordenando as tarefas por data
+        val cursor = taskDatabase.rawQuery(
+            "SELECT * FROM $TASK_TABLE ORDER BY " +
+                    "substr($DEADLINE_COLUMN, 7, 4) || substr($DEADLINE_COLUMN, 4, 2) || substr($DEADLINE_COLUMN, 1, 2)",
+            null
+        )
         while (cursor.moveToNext()) {
             taskList.add(cursor.toTask())
         }
