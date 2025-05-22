@@ -42,7 +42,7 @@
         android:id="@+id/etDeadline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Data (ex: 21/05/2025)"
+        android:hint="Data de hoje ou maior"
         android:textColor="#FFFFFF"
         android:textColorHint="#AAAAAA"
         android:focusable="false"

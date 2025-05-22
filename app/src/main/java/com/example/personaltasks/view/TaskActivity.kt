@@ -1,5 +1,6 @@
 package com.example.personaltasks.view
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.app.Activity
@@ -20,6 +21,7 @@ class TaskActivity : AppCompatActivity() {
         ActivityTaskBinding.inflate(layoutInflater)
     }
 
+    @SuppressLint("SimpleDateFormat", "DefaultLocale")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -62,12 +64,49 @@ class TaskActivity : AppCompatActivity() {
         // botão salvar
         with(binding) {
             btnSave.setOnClickListener {
+                // Adicionando trim para tirar os espaços em branco
+                val title = etTitle.text.toString().trim()
+                val description = etDescription.text.toString().trim()
+                val deadline = etDeadline.text.toString().trim()
+                val details = etDetails.text.toString().trim()
+
+                // validar titulo
+                if (title.isBlank()) {
+                    etTitle.error = "O título não pode estar em branco"
+                    etTitle.requestFocus()
+                    return@setOnClickListener
+                }
+                // validar data
+                val sdf = java.text.SimpleDateFormat("dd/MM/yyyy")
+                sdf.isLenient = false
+
+                try {
+                    val taskDate = sdf.parse(deadline)
+                    val today = Calendar.getInstance().apply {
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }.time
+
+                    if (taskDate.before(today)) {
+                        etDeadline.error = "A data não pode ser anterior à hoje"
+                        etDeadline.requestFocus()
+                        return@setOnClickListener
+                    }
+                } catch (e: Exception) {
+                    etDeadline.error = "Data inválida"
+                    etDeadline.requestFocus()
+                    return@setOnClickListener
+                }
+
+                // criar a Task se tudo for valido
                 val task = Task(
                     receivedTask?.id ?: hashCode(),
-                    etTitle.text.toString(),
-                    etDescription.text.toString(),
-                    etDeadline.text.toString(),
-                    etDetails.text.toString()
+                    title,
+                    description,
+                    deadline,
+                    details
                 )
                 val position = intent.getIntExtra(EXTRA_TASK_POSITION, -1)
                 val resultIntent = Intent().apply {
