@@ -1,5 +1,6 @@
 package com.example.personaltasks.view
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -70,8 +71,10 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                 }
             }
         }
-
-        // Carrega as tarefas do banco
+    }
+    // Carrega as tarefas do banco sempre que volta a MainActivity
+    override fun onResume() {
+        super.onResume()
         loadTasksFromDatabase()
     }
 
@@ -113,6 +116,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         startActivity(intent)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadTasksFromDatabase() {
         val dbTasks = mainController.getAllTasks()
         taskList.clear()
