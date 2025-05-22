@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.personaltasks.R
 import com.example.personaltasks.adapter.TaskAdapter
+import com.example.personaltasks.controller.MainController
 import com.example.personaltasks.databinding.ActivityMainBinding
 import com.example.personaltasks.model.Constant.EXTRA_TASK
 import com.example.personaltasks.model.Constant.EXTRA_TASK_POSITION
@@ -28,18 +29,21 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     private val taskList = mutableListOf<Task>()
     private lateinit var taskAdapter: TaskAdapter
 
+    // Controller com acesso ao banco
+    private val mainController: MainController by lazy {
+        MainController(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(amb.root)
         setSupportActionBar(amb.toolbar)
 
-        // Inicializa o adapter com a lista mutável
         taskAdapter = TaskAdapter(taskList, this)
         amb.rvTaks.layoutManager = LinearLayoutManager(this)
         amb.rvTaks.adapter = taskAdapter
 
-        // Launcher para adicionar nova tarefa
         newTaskLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -51,29 +55,31 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                     data?.getParcelableExtra<Task>(EXTRA_TASK)
                 }
 
-                // recupera a posição da intent
                 val position = data?.getIntExtra(EXTRA_TASK_POSITION, -1) ?: -1
 
                 receivedTask?.let { task ->
                     if (position != -1) {
-                        // atualiza uma tarefa
                         taskList[position] = task
                         taskAdapter.notifyItemChanged(position)
+                        mainController.updateTask(task) // Atualiza no banco
                     } else {
-                        // adiciona uma nova tarefa
                         taskList.add(task)
                         taskAdapter.notifyItemInserted(taskList.size - 1)
+                        mainController.insertTask(task) // Insere no banco
                     }
                 }
             }
         }
 
+        // Carrega as tarefas do banco
+        loadTasksFromDatabase()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.new_task_menu -> {
@@ -94,8 +100,10 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     }
 
     override fun onRemoveTaskMenuItemClick(position: Int) {
+        val taskToRemove = taskList[position]
         taskList.removeAt(position)
         taskAdapter.notifyItemRemoved(position)
+        mainController.removeTask(taskToRemove.id!!) // Remove do banco
     }
 
     override fun onDetailsTaskMenuItemClick(position: Int) {
@@ -105,4 +113,10 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         startActivity(intent)
     }
 
+    private fun loadTasksFromDatabase() {
+        val dbTasks = mainController.getAllTasks()
+        taskList.clear()
+        taskList.addAll(dbTasks)
+        taskAdapter.notifyDataSetChanged()
+    }
 }
