@@ -41,7 +41,7 @@ class TaskActivity : AppCompatActivity() {
                 etDescription.setText(task.description)
                 etDeadline.setText(task.deadline)
                 etDetails.setText(task.details)
-
+                etIsDone.isChecked
                 // Verifica se a tarefa está sendo visualizada apenas (sem edição)
                 val isViewOnly = intent.getBooleanExtra(EXTRA_VIEW_TASK, false)
                 if (isViewOnly) {
@@ -77,6 +77,7 @@ class TaskActivity : AppCompatActivity() {
                 val description = etDescription.text.toString().trim()
                 val deadline = etDeadline.text.toString().trim()
                 val details = etDetails.text.toString().trim()
+                val isDone = etIsDone.isChecked
 
                 // Verifica se o título está em branco
                 if (title.isBlank()) {
@@ -116,7 +117,8 @@ class TaskActivity : AppCompatActivity() {
                     title,
                     description,
                     deadline,
-                    details
+                    details,
+                    isDone
                 )
 
                 // Recupera a posição da tarefa (caso esteja editando)

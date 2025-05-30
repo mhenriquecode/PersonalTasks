@@ -138,6 +138,4 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         taskList.addAll(dbTasks)
         taskAdapter.notifyDataSetChanged() // Atualiza a tela
     }
-
-    // commite teste
 }

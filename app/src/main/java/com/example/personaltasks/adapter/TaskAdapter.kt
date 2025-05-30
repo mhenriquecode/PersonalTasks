@@ -22,6 +22,7 @@ RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
             binding.txtTitle.text = task.title
             binding.txtDescription.text = task.description
             binding.txtDate.text = task.deadline
+            binding.txtIsdone.isChecked = task.isDone
         }
         init {
             // Clique longo → mostra menu de contexto
