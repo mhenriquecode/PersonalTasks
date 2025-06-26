@@ -37,6 +37,26 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this, "Erro ao fazer login: ${it.message}", Toast.LENGTH_LONG).show()
                 }
         }
+
+        binding.btnRegister.setOnClickListener {
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Conta criada com sucesso", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Erro ao criar conta: ${it.message}", Toast.LENGTH_LONG).show()
+                }
+        }
     }
 
 }
