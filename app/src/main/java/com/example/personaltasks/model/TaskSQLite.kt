@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
+import com.example.personaltasks.model.Constant.IS_DONE_COLUMN
 import java.sql.SQLException
 
 class TaskSqlite(context: Context): TaskDao {
@@ -24,10 +25,12 @@ class TaskSqlite(context: Context): TaskDao {
                 $TITLE_COLUMN TEXT NOT NULL,
                 $DESCRIPTION_COLUMN TEXT NOT NULL,
                 $DEADLINE_COLUMN TEXT NOT NULL,
-                $DETAILS_COLUMN TEXT NOT NULL
+                $DETAILS_COLUMN TEXT NOT NULL,
+                $IS_DONE_COLUMN INTEGER NOT NULL
             );
         """
     }
+
 
     private val taskDatabase: SQLiteDatabase = context.openOrCreateDatabase(
         TASK_DATABASE_FILE,
@@ -95,6 +98,7 @@ class TaskSqlite(context: Context): TaskDao {
         put(DESCRIPTION_COLUMN, description)
         put(DEADLINE_COLUMN, deadline)
         put(DETAILS_COLUMN, details)
+        put(IS_DONE_COLUMN, if (isDone) 1 else 0)
     }
 
     private fun Cursor.toTask() = Task(
@@ -102,6 +106,7 @@ class TaskSqlite(context: Context): TaskDao {
         getString(getColumnIndexOrThrow(TITLE_COLUMN)),
         getString(getColumnIndexOrThrow(DESCRIPTION_COLUMN)),
         getString(getColumnIndexOrThrow(DEADLINE_COLUMN)),
-        getString(getColumnIndexOrThrow(DETAILS_COLUMN))
+        getString(getColumnIndexOrThrow(DETAILS_COLUMN)),
+        getInt(getColumnIndexOrThrow(IS_DONE_COLUMN)) == 1
     )
 }

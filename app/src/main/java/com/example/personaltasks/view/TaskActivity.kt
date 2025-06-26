@@ -41,7 +41,7 @@ class TaskActivity : AppCompatActivity() {
                 etDescription.setText(task.description)
                 etDeadline.setText(task.deadline)
                 etDetails.setText(task.details)
-                etIsDone.isChecked
+                etIsDone.isChecked = task.isDone
                 // Verifica se a tarefa está sendo visualizada apenas (sem edição)
                 val isViewOnly = intent.getBooleanExtra(EXTRA_VIEW_TASK, false)
                 if (isViewOnly) {
@@ -49,6 +49,7 @@ class TaskActivity : AppCompatActivity() {
                     etDescription.isEnabled = false
                     etDeadline.isEnabled = false
                     etDetails.isEnabled = false
+                    etIsDone.isEnabled = false
                     btnSave.visibility = View.GONE // Esconde o botão salvar
                 }
             }
