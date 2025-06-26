@@ -19,6 +19,7 @@ import com.example.personaltasks.model.Constant.EXTRA_TASK
 import com.example.personaltasks.model.Constant.EXTRA_TASK_POSITION
 import com.example.personaltasks.model.Constant.EXTRA_VIEW_TASK
 import com.example.personaltasks.model.Task
+import com.google.firebase.Firebase
 
 class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
@@ -79,6 +80,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                 }
             }
         }
+        Firebase
     }
 
     // Recarrega as tarefas do banco sempre que a tela principal volta a aparecer
