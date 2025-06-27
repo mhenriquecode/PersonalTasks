@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/reactivate_task"
+        android:title="Reativar Tarefa" />
+    <item
+        android:id="@+id/details_task_deleted"
+        android:title="Detalhes" />
+</menu>
