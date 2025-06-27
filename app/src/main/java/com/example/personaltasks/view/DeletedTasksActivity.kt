@@ -1,6 +1,5 @@
 package com.example.personaltasks.view
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +9,8 @@ import com.example.personaltasks.controller.MainController
 import com.example.personaltasks.databinding.ActivityDeletedTasksBinding
 import com.example.personaltasks.model.Constant
 import com.example.personaltasks.model.Task
+import android.app.Activity
+import android.widget.Toast
 
 class DeletedTasksActivity : AppCompatActivity(), OnTaskClickListener {
 
@@ -25,37 +26,58 @@ class DeletedTasksActivity : AppCompatActivity(), OnTaskClickListener {
 
         controller = MainController(this)
 
-        adapter = TaskAdapter(deletedTasks, this, true)
+        adapter = TaskAdapter(deletedTasks, this, true) // true para tela de excluídas
         binding.rvDeletedTasks.layoutManager = LinearLayoutManager(this)
         binding.rvDeletedTasks.adapter = adapter
 
         binding.btnBackToMain.setOnClickListener {
-            setResult(Activity.RESULT_CANCELED) // apenas para indicar que a operação foi "cancelada"
-            finish() // Fecha a DeletedTasksActivity e retorna para a MainActivity
+            setResult(Activity.RESULT_CANCELED)
+            finish()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // Atualiza a lista e notifica o adapter, sem recriar
-        deletedTasks.clear()
-        deletedTasks.addAll(controller.getDeletedTasks())
-        adapter.notifyDataSetChanged()
+        loadDeletedTasks() // Carrega tarefas excluídas
+    }
+
+    private fun loadDeletedTasks() {
+        controller.getDeletedTasks { fetchedTasks ->
+            deletedTasks.clear()
+            deletedTasks.addAll(fetchedTasks)
+            adapter.notifyDataSetChanged()
+        }
     }
 
     override fun onEditTaskMenuItemClick(position: Int) {
-        // Reativar a tarefa (seta isDeleted como false)
+        // Reativar Tarefa
         val task = deletedTasks[position]
-        task.isDeleted = false
-        controller.updateTask(task)
-
-        // Atualiza a lista após reativar
-        deletedTasks.removeAt(position)
-        adapter.notifyItemRemoved(position)
+        task.isDeleted = false // Marca como não excluída
+        controller.updateTask(task) { success -> // Atualiza no Firestore
+            if (success) {
+                Toast.makeText(this, "Tarefa reativada com sucesso!", Toast.LENGTH_SHORT).show()
+                loadDeletedTasks() // Recarrega a lista para refletir a mudança
+            } else {
+                Toast.makeText(this, "Erro ao reativar tarefa.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onRemoveTaskMenuItemClick(position: Int) {
-        //exclusão definitiva, chamaria controller.deleteTask(task.id!!) aqui
+        val taskToRemove = deletedTasks[position]
+        // O firestoreId é crucial para deletar do Firestore
+        taskToRemove.firestoreId?.let { firestoreId ->
+            controller.deleteTask(firestoreId) { success ->
+                if (success) {
+                    Toast.makeText(this, "Tarefa removida permanentemente!", Toast.LENGTH_SHORT).show()
+                    loadDeletedTasks() // Recarrega a lista após a exclusão
+                } else {
+                    Toast.makeText(this, "Erro ao remover tarefa permanentemente.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } ?: run {
+            Toast.makeText(this, "Erro: ID do Firestore nulo. Não foi possível remover.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDetailsTaskMenuItemClick(position: Int) {
