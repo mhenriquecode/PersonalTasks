@@ -12,5 +12,6 @@ data class Task(
     var deadline: String = "",
     var details: String = "",
     var isDone: Boolean = false,
-    var isDeleted: Boolean = false
+    var isDeleted: Boolean = false,
+    var firestoreId: String? = null
 ) : Parcelable
