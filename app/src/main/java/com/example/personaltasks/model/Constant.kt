@@ -7,4 +7,5 @@ object Constant {
     const val INVALID_TASK_ID = -1
     const val IS_DONE_COLUMN = "isDone"
     const val IS_DELETED_COLUMN = "isDeleted"
+    const val EXTRA_IS_EDITING = "extra_is_editing"
 }
