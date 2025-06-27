@@ -1,147 +1,122 @@
 package com.example.personaltasks.view
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Build
-import android.view.View
+import android.widget.Toast
 import com.example.personaltasks.databinding.ActivityTaskBinding
-import com.example.personaltasks.model.Constant.EXTRA_TASK
-import com.example.personaltasks.model.Constant.EXTRA_TASK_POSITION
-import com.example.personaltasks.model.Constant.EXTRA_VIEW_TASK
+import com.example.personaltasks.model.Constant
 import com.example.personaltasks.model.Task
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class TaskActivity : AppCompatActivity() {
 
     // Faz o vínculo com a interface gráfica (ViewBinding)
-    private val binding: ActivityTaskBinding by lazy {
-        ActivityTaskBinding.inflate(layoutInflater)
-    }
+    private lateinit var binding: ActivityTaskBinding
+    private var selectedTask: Task? = null
+    private var isViewMode: Boolean = false
+    private var isEditing: Boolean = false // Nova flag para indicar modo de edição
 
-    @SuppressLint("SimpleDateFormat", "DefaultLocale")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root) // Define a visualização da tela
+        binding = ActivityTaskBinding.inflate(layoutInflater) // Ajuste para o nome correto do seu layout
+        setContentView(binding.root)
 
-        // Recupera a tarefa enviada pela MainActivity (se houver)
-        val receivedTask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(EXTRA_TASK, Task::class.java)
+        // Recebe a tarefa se estiver em modo de edição ou visualização
+        selectedTask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(Constant.EXTRA_TASK, Task::class.java)
         } else {
-            intent.getParcelableExtra<Task>(EXTRA_TASK)
+            intent.getParcelableExtra<Task>(Constant.EXTRA_TASK)
+        }
+        isViewMode = intent.getBooleanExtra(Constant.EXTRA_VIEW_TASK, false)
+        // Se selectedTask não for nulo, é uma edição ou visualização
+        isEditing = selectedTask != null // Automaticamente true se há uma tarefa
+
+        if (selectedTask != null) {
+            binding.etTitle.setText(selectedTask!!.title)
+            binding.etDescription.setText(selectedTask!!.description)
+            binding.etDeadline.setText(selectedTask!!.deadline)
+            binding.etDetails.setText(selectedTask!!.details)
+            binding.etIsDone.isChecked = selectedTask!!.isDone
         }
 
-        // Se recebeu uma tarefa, preenche os campos com os dados dela
-        receivedTask?.let { task ->
-            with(binding) {
-                etTitle.setText(task.title)
-                etDescription.setText(task.description)
-                etDeadline.setText(task.deadline)
-                etDetails.setText(task.details)
-                etIsDone.isChecked = task.isDone
-                // Verifica se a tarefa está sendo visualizada apenas (sem edição)
-                val isViewOnly = intent.getBooleanExtra(EXTRA_VIEW_TASK, false)
-                if (isViewOnly) {
-                    etTitle.isEnabled = false
-                    etDescription.isEnabled = false
-                    etDeadline.isEnabled = false
-                    etDetails.isEnabled = false
-                    etIsDone.isEnabled = false
-                    btnSave.visibility = View.GONE // Esconde o botão salvar
-                }
+        if (isViewMode) {
+            // Desativa a edição dos campos
+            binding.etTitle.isEnabled = false
+            binding.etDescription.isEnabled = false
+            binding.etDeadline.isEnabled = false
+            binding.etDetails.isEnabled = false
+            binding.etIsDone.isEnabled = false
+            binding.btnSave.visibility = android.view.View.GONE // Esconde o botão Salvar
+            binding.btnCancel.text = "Voltar" // Muda o texto para Voltar
+        }
+
+        binding.etDeadline.setOnClickListener {
+            showDatePickerDialog()
+        }
+
+        binding.btnSave.setOnClickListener {
+            saveTask()
+        }
+
+        binding.btnCancel.setOnClickListener {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+        }
+    }
+
+    private fun showDatePickerDialog() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+            val selectedDate = Calendar.getInstance().apply {
+                set(selectedYear, selectedMonth, selectedDay)
             }
-        }
-
-        // Quando o usuário clica no campo de data, abre o DatePicker
-        with(binding) {
-            etDeadline.setOnClickListener {
-                val calendar = Calendar.getInstance()
-                val year = calendar.get(Calendar.YEAR)
-                val month = calendar.get(Calendar.MONTH)
-                val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-                // Mostra o DatePicker com a data atual como padrão
-                DatePickerDialog(this@TaskActivity, { _, y, m, d ->
-                    etDeadline.setText(String.format("%02d/%02d/%04d", d, m + 1, y))
-                }, year, month, day).show()
+            // Verifica se a data selecionada não é anterior à data atual
+            if (selectedDate.timeInMillis >= Calendar.getInstance().timeInMillis - (1000 * 60 * 60 * 24)) { // Permite data de hoje
+                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                binding.etDeadline.setText(dateFormat.format(selectedDate.time))
+            } else {
+                Toast.makeText(this, "A data deve ser hoje ou maior.", Toast.LENGTH_SHORT).show()
             }
+        }, year, month, day)
+        datePickerDialog.show()
+    }
+
+    private fun saveTask() {
+        val title = binding.etTitle.text.toString().trim()
+        val description = binding.etDescription.text.toString().trim()
+        val deadline = binding.etDeadline.text.toString().trim()
+        val details = binding.etDetails.text.toString().trim()
+        val isDone = binding.etIsDone.isChecked
+
+        if (title.isEmpty() || description.isEmpty() || deadline.isEmpty()) {
+            Toast.makeText(this, "Por favor, preencha Título, Descrição e Data.", Toast.LENGTH_SHORT).show()
+            return
         }
 
-        // Quando o botão salvar é clicado
-        with(binding) {
-            btnSave.setOnClickListener {
-                // Lê e limpa os campos de entrada
-                val title = etTitle.text.toString().trim()
-                val description = etDescription.text.toString().trim()
-                val deadline = etDeadline.text.toString().trim()
-                val details = etDetails.text.toString().trim()
-                val isDone = etIsDone.isChecked
+        val taskToSave = selectedTask ?: Task() // Reutiliza a tarefa existente ou cria uma nova
 
-                // Verifica se o título está em branco
-                if (title.isBlank()) {
-                    etTitle.error = "O título não pode estar em branco"
-                    etTitle.requestFocus()
-                    return@setOnClickListener
-                }
+        taskToSave.title = title
+        taskToSave.description = description
+        taskToSave.deadline = deadline
+        taskToSave.details = details
+        taskToSave.isDone = isDone
+        // isDeleted não é manipulado nesta tela
 
-                // Validação da data
-                val sdf = java.text.SimpleDateFormat("dd/MM/yyyy")
-                sdf.isLenient = false
-
-                try {
-                    val taskDate = sdf.parse(deadline)
-                    val today = Calendar.getInstance().apply {
-                        set(Calendar.HOUR_OF_DAY, 0)
-                        set(Calendar.MINUTE, 0)
-                        set(Calendar.SECOND, 0)
-                        set(Calendar.MILLISECOND, 0)
-                    }.time
-
-                    // Verifica se a data informada é anterior à data atual
-                    if (taskDate.before(today)) {
-                        etDeadline.error = "A data não pode ser anterior à hoje"
-                        etDeadline.requestFocus()
-                        return@setOnClickListener
-                    }
-                } catch (e: Exception) {
-                    etDeadline.error = "Data inválida"
-                    etDeadline.requestFocus()
-                    return@setOnClickListener
-                }
-
-                // Cria uma nova tarefa com os dados preenchidos
-                val task = Task(
-                    id = receivedTask?.id,
-                    title = title,
-                    description = description,
-                    deadline = deadline,
-                    details = details,
-                    isDone = isDone
-                )
-
-                // Recupera a posição da tarefa (caso esteja editando)
-                val position = intent.getIntExtra(EXTRA_TASK_POSITION, -1)
-
-                // Cria um intent com a tarefa e a posição para devolver à MainActivity
-                val resultIntent = Intent().apply {
-                    putExtra(EXTRA_TASK, task)
-                    putExtra(EXTRA_TASK_POSITION, position)
-                }
-
-                setResult(Activity.RESULT_OK, resultIntent) // Define o resultado
-                finish() // Fecha a tela
-            }
+        val resultIntent = Intent().apply {
+            putExtra(Constant.EXTRA_TASK, taskToSave)
+            putExtra(Constant.EXTRA_IS_EDITING, isEditing) // Indica se é edição
         }
-
-        // Quando o botão cancelar é clicado
-        with(binding){
-            btnCancel.setOnClickListener {
-                setResult(Activity.RESULT_CANCELED) // Informa que foi cancelado
-                finish()
-            }
-        }
+        setResult(Activity.RESULT_OK, resultIntent)
+        finish()
     }
 }
