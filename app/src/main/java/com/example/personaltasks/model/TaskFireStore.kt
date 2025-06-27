@@ -163,6 +163,7 @@ class TaskFirestore(private val context: Context) : TaskDao {
             "details" to task.details,
             "isDone" to task.isDone,
             "isDeleted" to task.isDeleted,
+            "prioridade" to task.prioridade
             // Não inclua o id numérico aqui, ele não é o ID do documento no Firestore
         )
     }
@@ -176,7 +177,8 @@ class TaskFirestore(private val context: Context) : TaskDao {
             deadline = data["deadline"] as? String ?: "",
             details = data["details"] as? String ?: "",
             isDone = data["isDone"] as? Boolean ?: false,
-            isDeleted = data["isDeleted"] as? Boolean ?: false
+            isDeleted = data["isDeleted"] as? Boolean ?: false,
+            prioridade = data["prioridade"] as? String ?: ""
         ).apply {
             firestoreId = documentId // Crucial: armazena o ID real do Firestore
         }

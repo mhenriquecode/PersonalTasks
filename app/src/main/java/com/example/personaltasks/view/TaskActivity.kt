@@ -43,6 +43,7 @@ class TaskActivity : AppCompatActivity() {
             binding.etDeadline.setText(selectedTask!!.deadline)
             binding.etDetails.setText(selectedTask!!.details)
             binding.etIsDone.isChecked = selectedTask!!.isDone
+            binding.prioridade.setText(selectedTask!!.prioridade)
         }
 
         if (isViewMode) {
@@ -52,6 +53,7 @@ class TaskActivity : AppCompatActivity() {
             binding.etDeadline.isEnabled = false
             binding.etDetails.isEnabled = false
             binding.etIsDone.isEnabled = false
+            binding.prioridade.isEnabled = false
             binding.btnSave.visibility = android.view.View.GONE // Esconde o botão Salvar
             binding.btnCancel.text = "Voltar" // Muda o texto para Voltar
         }
@@ -96,8 +98,8 @@ class TaskActivity : AppCompatActivity() {
         val description = binding.etDescription.text.toString().trim()
         val deadline = binding.etDeadline.text.toString().trim()
         val details = binding.etDetails.text.toString().trim()
+        val priory = binding.prioridade.text.toString().trim()
         val isDone = binding.etIsDone.isChecked
-
         if (title.isEmpty() || description.isEmpty() || deadline.isEmpty()) {
             Toast.makeText(this, "Por favor, preencha Título, Descrição e Data.", Toast.LENGTH_SHORT).show()
             return
@@ -110,6 +112,7 @@ class TaskActivity : AppCompatActivity() {
         taskToSave.deadline = deadline
         taskToSave.details = details
         taskToSave.isDone = isDone
+        taskToSave.prioridade = priory
         // isDeleted não é manipulado nesta tela
 
         val resultIntent = Intent().apply {

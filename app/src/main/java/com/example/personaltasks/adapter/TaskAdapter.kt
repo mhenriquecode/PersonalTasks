@@ -21,7 +21,8 @@ class TaskAdapter(private val taskList: List<Task>,
             binding.txtTitle.text = task.title
             binding.txtDescription.text = task.description
             binding.txtDate.text = task.deadline
-            binding.txtIsdone.isChecked = task.isDone
+          //  binding.etIsDone.isChecked = task.isDone
+            binding.txtPrioridade.text = task.prioridade
         }
         init {
             // Clique longo → mostra menu de contexto
