@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
         setSupportActionBar(amb.toolbar) // Usa a toolbar personalizada
 
         // Inicializa o adaptador e configura o RecyclerView
-        taskAdapter = TaskAdapter(taskList, this)
+        taskAdapter = TaskAdapter(taskList, this, false)
         amb.rvTaks.layoutManager = LinearLayoutManager(this)
         amb.rvTaks.adapter = taskAdapter
 
@@ -80,7 +81,10 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                 }
             }
         }
-        Firebase
+        amb.btnDeletedTasks.setOnClickListener {
+            val intent = Intent(this, DeletedTasksActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     // Recarrega as tarefas do banco sempre que a tela principal volta a aparecer
@@ -119,9 +123,14 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
     // Quando o usuário escolhe "Remover" em uma tarefa
     override fun onRemoveTaskMenuItemClick(position: Int) {
         val taskToRemove = taskList[position]
-        taskList.removeAt(position) // Remove da lista
+        taskToRemove.isDeleted = true
+
+        // Verifique o ID da task aqui:
+        Toast.makeText(this, "ID da tarefa: ${taskToRemove.id}", Toast.LENGTH_SHORT).show()
+
+        mainController.updateTask(taskToRemove)
+        taskList.removeAt(position)
         taskAdapter.notifyItemRemoved(position)
-        mainController.removeTask(taskToRemove.id!!) // Remove do banco
     }
 
     // Quando o usuário escolhe "Detalhes" em uma tarefa
