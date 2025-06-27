@@ -5,10 +5,11 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
+import com.example.personaltasks.model.Constant.IS_DELETED_COLUMN
 import com.example.personaltasks.model.Constant.IS_DONE_COLUMN
 import java.sql.SQLException
 
-class TaskSqlite(context: Context): TaskDao {
+class TaskSqlite(context: Context) : TaskDao {
 
     companion object {
         private const val TASK_DATABASE_FILE = "taskList"
@@ -21,16 +22,16 @@ class TaskSqlite(context: Context): TaskDao {
 
         private const val CREATE_TASK_TABLE_STATEMENT = """
             CREATE TABLE IF NOT EXISTS $TASK_TABLE (
-                $ID_COLUMN INTEGER NOT NULL PRIMARY KEY,
+                $ID_COLUMN INTEGER PRIMARY KEY AUTOINCREMENT,
                 $TITLE_COLUMN TEXT NOT NULL,
                 $DESCRIPTION_COLUMN TEXT NOT NULL,
                 $DEADLINE_COLUMN TEXT NOT NULL,
                 $DETAILS_COLUMN TEXT NOT NULL,
-                $IS_DONE_COLUMN INTEGER NOT NULL
+                $IS_DONE_COLUMN INTEGER NOT NULL,
+                $IS_DELETED_COLUMN INTEGER NOT NULL DEFAULT 0
             );
         """
     }
-
 
     private val taskDatabase: SQLiteDatabase = context.openOrCreateDatabase(
         TASK_DATABASE_FILE,
@@ -67,15 +68,29 @@ class TaskSqlite(context: Context): TaskDao {
 
     override fun retrieveTasks(): MutableList<Task> {
         val taskList = mutableListOf<Task>()
-        // Ordenando as tarefas por data
         val cursor = taskDatabase.rawQuery(
-            "SELECT * FROM $TASK_TABLE ORDER BY " +
+            "SELECT * FROM $TASK_TABLE WHERE $IS_DELETED_COLUMN = 0 ORDER BY " +
                     "substr($DEADLINE_COLUMN, 7, 4) || substr($DEADLINE_COLUMN, 4, 2) || substr($DEADLINE_COLUMN, 1, 2)",
             null
         )
         while (cursor.moveToNext()) {
             taskList.add(cursor.toTask())
         }
+        cursor.close()
+        return taskList
+    }
+
+    override fun retrieveDeletedTasks(): MutableList<Task> {
+        val taskList = mutableListOf<Task>()
+        val cursor = taskDatabase.rawQuery(
+            "SELECT * FROM $TASK_TABLE WHERE $IS_DELETED_COLUMN = 1 ORDER BY " + // Filtra por isDeleted = 1
+                    "substr($DEADLINE_COLUMN, 7, 4) || substr($DEADLINE_COLUMN, 4, 2) || substr($DEADLINE_COLUMN, 1, 2)",
+            null
+        )
+        while (cursor.moveToNext()) {
+            taskList.add(cursor.toTask())
+        }
+        cursor.close()
         return taskList
     }
 
@@ -93,12 +108,13 @@ class TaskSqlite(context: Context): TaskDao {
     }
 
     private fun Task.toContentValues() = ContentValues().apply {
-        put(ID_COLUMN, id)
+        if (id != null) put(ID_COLUMN, id)
         put(TITLE_COLUMN, title)
         put(DESCRIPTION_COLUMN, description)
         put(DEADLINE_COLUMN, deadline)
         put(DETAILS_COLUMN, details)
         put(IS_DONE_COLUMN, if (isDone) 1 else 0)
+        put(IS_DELETED_COLUMN, if (isDeleted) 1 else 0)
     }
 
     private fun Cursor.toTask() = Task(
@@ -107,6 +123,7 @@ class TaskSqlite(context: Context): TaskDao {
         getString(getColumnIndexOrThrow(DESCRIPTION_COLUMN)),
         getString(getColumnIndexOrThrow(DEADLINE_COLUMN)),
         getString(getColumnIndexOrThrow(DETAILS_COLUMN)),
-        getInt(getColumnIndexOrThrow(IS_DONE_COLUMN)) == 1
+        getInt(getColumnIndexOrThrow(IS_DONE_COLUMN)) == 1,
+        getInt(getColumnIndexOrThrow(IS_DELETED_COLUMN)) == 1
     )
 }
