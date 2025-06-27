@@ -11,13 +11,12 @@ import com.example.personaltasks.view.OnTaskClickListener
 
 // passando uma lista de tasks
 class TaskAdapter(private val taskList: List<Task>,
-                  private val onTaskClickListener: OnTaskClickListener
+                  private val onTaskClickListener: OnTaskClickListener,
+                  private val isDeletedTasksScreen: Boolean = false
 ) :
-RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
+    RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
 
-    // criando viewHolder interno ao Adapter para pegar as task items
     inner class TaskViewHolder(val binding: TaskItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        // preenchendo a task
         fun bind(task: Task) {
             binding.txtTitle.text = task.title
             binding.txtDescription.text = task.description
@@ -29,17 +28,32 @@ RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
             binding.root.setOnCreateContextMenuListener { menu, _, _ ->
                 (onTaskClickListener as AppCompatActivity).menuInflater.inflate(R.menu.context_menu, menu)
 
-                menu.findItem(R.id.edit_task).setOnMenuItemClickListener {
+                // Encontre os itens do menu
+                val editTaskItem = menu.findItem(R.id.edit_task)
+                val removeTaskItem = menu.findItem(R.id.remove_task)
+                val detailsTaskItem = menu.findItem(R.id.details_task)
+
+                if (isDeletedTasksScreen) {
+                    // Se estiver na tela de tarefas excluídas:
+                    editTaskItem.title = "Reativar Tarefa" // Renomeia "Editar task"
+                    removeTaskItem.isVisible = false // Oculta "Remover task"
+                } else {
+                    // Se estiver na tela principal (ou outra tela não excluída):
+                    editTaskItem.title = "Editar task" // Garante o nome original (caso mude)
+                    removeTaskItem.isVisible = true // Garante visibilidade
+                }
+
+                editTaskItem.setOnMenuItemClickListener {
                     onTaskClickListener.onEditTaskMenuItemClick(adapterPosition)
                     true
                 }
 
-                menu.findItem(R.id.remove_task).setOnMenuItemClickListener {
+                removeTaskItem.setOnMenuItemClickListener {
                     onTaskClickListener.onRemoveTaskMenuItemClick(adapterPosition)
                     true
                 }
 
-                menu.findItem(R.id.details_task).setOnMenuItemClickListener {
+                detailsTaskItem.setOnMenuItemClickListener {
                     onTaskClickListener.onDetailsTaskMenuItemClick(adapterPosition)
                     true
                 }
