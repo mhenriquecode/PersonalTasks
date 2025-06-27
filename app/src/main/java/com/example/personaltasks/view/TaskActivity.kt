@@ -87,7 +87,7 @@ class TaskActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
 
-                // Validação da data usando SimpleDateFormat
+                // Validação da data
                 val sdf = java.text.SimpleDateFormat("dd/MM/yyyy")
                 sdf.isLenient = false
 
@@ -114,12 +114,12 @@ class TaskActivity : AppCompatActivity() {
 
                 // Cria uma nova tarefa com os dados preenchidos
                 val task = Task(
-                    receivedTask?.id ?: hashCode(), // Usa o ID anterior ou gera um novo
-                    title,
-                    description,
-                    deadline,
-                    details,
-                    isDone
+                    id = receivedTask?.id,
+                    title = title,
+                    description = description,
+                    deadline = deadline,
+                    details = details,
+                    isDone = isDone
                 )
 
                 // Recupera a posição da tarefa (caso esteja editando)
