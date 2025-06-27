@@ -1,13 +1,10 @@
 package com.example.personaltasks.view
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -16,137 +13,133 @@ import com.example.personaltasks.R
 import com.example.personaltasks.adapter.TaskAdapter
 import com.example.personaltasks.controller.MainController
 import com.example.personaltasks.databinding.ActivityMainBinding
-import com.example.personaltasks.model.Constant.EXTRA_TASK
-import com.example.personaltasks.model.Constant.EXTRA_TASK_POSITION
-import com.example.personaltasks.model.Constant.EXTRA_VIEW_TASK
+import com.example.personaltasks.model.Constant
 import com.example.personaltasks.model.Task
-import com.google.firebase.Firebase
-
 class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
-    private val amb: ActivityMainBinding by lazy {
-        ActivityMainBinding.inflate(layoutInflater)
-    }
+    private lateinit var amb: ActivityMainBinding
+    private lateinit var mainController: MainController
+    private lateinit var taskAdapter: TaskAdapter
+    private val taskList = mutableListOf<Task>()
 
     private lateinit var newTaskLauncher: ActivityResultLauncher<Intent>
-    private val taskList = mutableListOf<Task>()
-    private lateinit var taskAdapter: TaskAdapter
-
-    // Controller com acesso ao banco
-    private val mainController: MainController by lazy {
-        MainController(this)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(amb.root) // Define a visualização da tela
-        setSupportActionBar(amb.toolbar) // Usa a toolbar personalizada
+        amb = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(amb.root)
+        setSupportActionBar(amb.toolbar)
 
-        // Inicializa o adaptador e configura o RecyclerView
+        mainController = MainController(this)
+
+        // Passamos 'false' para indicar que não é a tela de tarefas excluídas
         taskAdapter = TaskAdapter(taskList, this, false)
         amb.rvTaks.layoutManager = LinearLayoutManager(this)
         amb.rvTaks.adapter = taskAdapter
 
-        // Define o que acontece quando a TaskActivity retorna um resultado
-        newTaskLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
+        // Configurar o launcher para adicionar/editar tarefas
+        newTaskLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                val data = result.data
-
-                // Recupera a tarefa enviada de volta pela TaskActivity
-                val receivedTask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    data?.getParcelableExtra(EXTRA_TASK, Task::class.java)
-                } else {
-                    data?.getParcelableExtra<Task>(EXTRA_TASK)
-                }
-
-                // Recupera a posição da tarefa (se for edição)
-                val position = data?.getIntExtra(EXTRA_TASK_POSITION, -1) ?: -1
-
-                // Se for uma tarefa válida, adiciona ou atualiza na lista e no banco
-                receivedTask?.let { task ->
-                    if (position != -1) {
-                        // Atualiza tarefa existente
-                        taskList[position] = task
-                        taskAdapter.notifyItemChanged(position)
-                        mainController.updateTask(task)
+                result.data?.let { data ->
+                    val task = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        data.getParcelableExtra(Constant.EXTRA_TASK, Task::class.java)
                     } else {
-                        // Adiciona nova tarefa
-                        taskList.add(task)
-                        taskAdapter.notifyItemInserted(taskList.size - 1)
-                        mainController.insertTask(task)
+                        data.getParcelableExtra<Task>(Constant.EXTRA_TASK)
+                    }
+                    val isEditing = data.getBooleanExtra(Constant.EXTRA_IS_EDITING, false) // Novo extra para saber se é edição
+
+                    task?.let { newTask ->
+                        if (isEditing) { // Se for edição, o firestoreId já deve estar na tarefa
+                            mainController.updateTask(newTask) { success ->
+                                if (success) {
+                                    Toast.makeText(this, "Tarefa atualizada com sucesso!", Toast.LENGTH_SHORT).show()
+                                    loadTasks() // Recarrega a lista
+                                } else {
+                                    Toast.makeText(this, "Erro ao atualizar tarefa.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            // Se for nova tarefa, Firestore vai gerar um ID
+                            mainController.insertTask(newTask) { success, firestoreId ->
+                                if (success) {
+                                    // Se precisar do firestoreId na UI imediatamente
+                                    // newTask.firestoreId = firestoreId
+                                    Toast.makeText(this, "Tarefa adicionada com sucesso!", Toast.LENGTH_SHORT).show()
+                                    loadTasks() // Recarrega a lista
+                                } else {
+                                    Toast.makeText(this, "Erro ao adicionar tarefa.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+
         amb.btnDeletedTasks.setOnClickListener {
-            val intent = Intent(this, DeletedTasksActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, DeletedTasksActivity::class.java))
         }
     }
 
-    // Recarrega as tarefas do banco sempre que a tela principal volta a aparecer
     override fun onResume() {
         super.onResume()
-        loadTasksFromDatabase()
+        loadTasks() // Carrega as tarefas sempre que a MainActivity for resumida
     }
 
-    // Cria o menu superior com a opção de adicionar nova tarefa
+    private fun loadTasks() {
+        mainController.getAllTasks { fetchedTasks ->
+            taskList.clear()
+            taskList.addAll(fetchedTasks)
+            taskAdapter.notifyDataSetChanged()
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
-    // Trata o clique no item do menu (nova tarefa)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
+        return when (item.itemId) {
             R.id.new_task_menu -> {
-                val intent = Intent(this, TaskActivity::class.java)
-                newTaskLauncher.launch(intent) // Abre a tela de nova tarefa
+                newTaskLauncher.launch(Intent(this, TaskActivity::class.java).apply {
+                    putExtra(Constant.EXTRA_IS_EDITING, false) // Nova tarefa
+                })
                 true
             }
-            else -> false
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
-    // Quando o usuário escolhe "Editar" em uma tarefa
     override fun onEditTaskMenuItemClick(position: Int) {
         val intent = Intent(this, TaskActivity::class.java).apply {
-            putExtra(EXTRA_TASK, taskList[position])
-            putExtra(EXTRA_TASK_POSITION, position)
+            putExtra(Constant.EXTRA_TASK, taskList[position])
+            // Não precisa mais de EXTRA_TASK_POSITION se você vai usar o firestoreId para update
+            putExtra(Constant.EXTRA_IS_EDITING, true) // Indica que é uma edição
         }
-        newTaskLauncher.launch(intent) // Abre a tela de edição de tarefa
+        newTaskLauncher.launch(intent)
     }
 
-    // Quando o usuário escolhe "Remover" em uma tarefa
     override fun onRemoveTaskMenuItemClick(position: Int) {
         val taskToRemove = taskList[position]
-        taskToRemove.isDeleted = true
-
-        // Verifique o ID da task aqui:
-        Toast.makeText(this, "ID da tarefa: ${taskToRemove.id}", Toast.LENGTH_SHORT).show()
-
-        mainController.updateTask(taskToRemove)
-        taskList.removeAt(position)
-        taskAdapter.notifyItemRemoved(position)
+        // Usa o firestoreId para a remoção lógica (marcar como isDeleted)
+        taskToRemove.firestoreId?.let { firestoreId ->
+            mainController.removeTask(taskToRemove) { success ->
+                if (success) {
+                    Toast.makeText(this, "Tarefa movida para a lixeira!", Toast.LENGTH_SHORT).show()
+                    loadTasks() // Recarrega a lista para atualizar a UI
+                } else {
+                    Toast.makeText(this, "Erro ao mover tarefa para lixeira.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } ?: Toast.makeText(this, "Erro: ID do Firestore nulo para remoção.", Toast.LENGTH_SHORT).show()
     }
 
-    // Quando o usuário escolhe "Detalhes" em uma tarefa
     override fun onDetailsTaskMenuItemClick(position: Int) {
-        val intent = Intent(this, TaskActivity::class.java)
-        intent.putExtra(EXTRA_TASK, taskList[position])
-        intent.putExtra(EXTRA_VIEW_TASK, true) // Modo de visualização apenas
+        val intent = Intent(this, TaskActivity::class.java).apply {
+            putExtra(Constant.EXTRA_TASK, taskList[position])
+            putExtra(Constant.EXTRA_VIEW_TASK, true)
+        }
         startActivity(intent)
-    }
-
-    // Carrega todas as tarefas do banco de dados e mostra no RecyclerView
-    @SuppressLint("NotifyDataSetChanged")
-    private fun loadTasksFromDatabase() {
-        val dbTasks = mainController.getAllTasks()
-        taskList.clear()
-        taskList.addAll(dbTasks)
-        taskAdapter.notifyDataSetChanged() // Atualiza a tela
     }
 }
