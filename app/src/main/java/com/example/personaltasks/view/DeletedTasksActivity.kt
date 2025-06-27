@@ -34,4 +34,26 @@ class DeletedTasksActivity : AppCompatActivity(), OnTaskClickListener {
             finish() // Fecha a DeletedTasksActivity e retorna para a MainActivity
         }
     }
+    override fun onEditTaskMenuItemClick(position: Int) {
+        // Reativar a tarefa (seta isDeleted como false)
+        val task = deletedTasks[position]
+        task.isDeleted = false
+        controller.updateTask(task)
+
+        // Atualiza a lista após reativar
+        deletedTasks.removeAt(position)
+        adapter.notifyItemRemoved(position)
+    }
+
+    override fun onRemoveTaskMenuItemClick(position: Int) {
+        //exclusão definitiva, chamaria controller.deleteTask(task.id!!) aqui
+    }
+    override fun onDetailsTaskMenuItemClick(position: Int) {
+        val task = deletedTasks[position]
+        val intent = Intent(this, TaskActivity::class.java).apply {
+            putExtra(Constant.EXTRA_TASK, task)
+            putExtra(Constant.EXTRA_VIEW_TASK, true)
+        }
+        startActivity(intent)
+    }
 }
