@@ -26,36 +26,48 @@ class TaskAdapter(private val taskList: List<Task>,
         init {
             // Clique longo → mostra menu de contexto
             binding.root.setOnCreateContextMenuListener { menu, _, _ ->
-                (onTaskClickListener as AppCompatActivity).menuInflater.inflate(R.menu.context_menu, menu)
-
-                // Encontre os itens do menu
-                val editTaskItem = menu.findItem(R.id.edit_task)
-                val removeTaskItem = menu.findItem(R.id.remove_task)
-                val detailsTaskItem = menu.findItem(R.id.details_task)
+                val menuInflater = (onTaskClickListener as AppCompatActivity).menuInflater
 
                 if (isDeletedTasksScreen) {
-                    // Se estiver na tela de tarefas excluídas:
-                    editTaskItem.title = "Reativar Tarefa" // Renomeia "Editar task"
-                    removeTaskItem.isVisible = false // Oculta "Remover task"
+                    // Infla o menu específico para tarefas excluídas
+                    menuInflater.inflate(R.menu.context_menu_deleted_tasks, menu)
+
+                    // Encontra os itens do novo menu
+                    val reactivateTaskItem = menu.findItem(R.id.reactivate_task)
+                    val detailsTaskDeletedItem = menu.findItem(R.id.details_task_deleted)
+
+                    // Define os listeners para os itens do novo menu
+                    reactivateTaskItem.setOnMenuItemClickListener {
+                        onTaskClickListener.onEditTaskMenuItemClick(adapterPosition) // Reutilizamos onEdit para reativar
+                        true
+                    }
+                    detailsTaskDeletedItem.setOnMenuItemClickListener {
+                        onTaskClickListener.onDetailsTaskMenuItemClick(adapterPosition)
+                        true
+                    }
+
                 } else {
-                    // Se estiver na tela principal (ou outra tela não excluída):
-                    editTaskItem.title = "Editar task" // Garante o nome original (caso mude)
-                    removeTaskItem.isVisible = true // Garante visibilidade
-                }
+                    // Infla o menu original para a tela principal
+                    menuInflater.inflate(R.menu.context_menu, menu)
 
-                editTaskItem.setOnMenuItemClickListener {
-                    onTaskClickListener.onEditTaskMenuItemClick(adapterPosition)
-                    true
-                }
+                    // Encontre os itens do menu original
+                    val editTaskItem = menu.findItem(R.id.edit_task)
+                    val removeTaskItem = menu.findItem(R.id.remove_task)
+                    val detailsTaskItem = menu.findItem(R.id.details_task)
 
-                removeTaskItem.setOnMenuItemClickListener {
-                    onTaskClickListener.onRemoveTaskMenuItemClick(adapterPosition)
-                    true
-                }
-
-                detailsTaskItem.setOnMenuItemClickListener {
-                    onTaskClickListener.onDetailsTaskMenuItemClick(adapterPosition)
-                    true
+                    // Define os listeners para os itens do menu original
+                    editTaskItem.setOnMenuItemClickListener {
+                        onTaskClickListener.onEditTaskMenuItemClick(adapterPosition)
+                        true
+                    }
+                    removeTaskItem.setOnMenuItemClickListener {
+                        onTaskClickListener.onRemoveTaskMenuItemClick(adapterPosition)
+                        true
+                    }
+                    detailsTaskItem.setOnMenuItemClickListener {
+                        onTaskClickListener.onDetailsTaskMenuItemClick(adapterPosition)
+                        true
+                    }
                 }
             }
         }
