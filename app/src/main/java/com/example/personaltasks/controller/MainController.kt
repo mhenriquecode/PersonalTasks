@@ -3,9 +3,7 @@ package com.example.personaltasks.controller
 import android.content.Context
 import android.util.Log
 import com.example.personaltasks.model.Task
-import com.example.personaltasks.model.TaskDao
 import com.example.personaltasks.model.TaskFirestore
-import com.example.personaltasks.model.TaskSqlite
 
 class MainController(private val context: Context) {
     // Apenas a instância de TaskFirestore
