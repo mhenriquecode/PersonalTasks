@@ -15,6 +15,8 @@ import com.example.personaltasks.controller.MainController
 import com.example.personaltasks.databinding.ActivityMainBinding
 import com.example.personaltasks.model.Constant
 import com.example.personaltasks.model.Task
+import com.google.firebase.auth.FirebaseAuth
+
 class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
     private lateinit var amb: ActivityMainBinding
@@ -107,8 +109,16 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
                 })
                 true
             }
+            R.id.logout_menu -> {
+                FirebaseAuth.getInstance().signOut()
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
+
         }
+
     }
 
     override fun onEditTaskMenuItemClick(position: Int) {

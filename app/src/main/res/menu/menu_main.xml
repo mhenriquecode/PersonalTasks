@@ -6,4 +6,8 @@
         android:title="Nova Tarefa"
         android:icon="@drawable/ic_add_pink"
         app:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/logout_menu"
+        android:title="Sair"
+        app:showAsAction="never" />
 </menu>
