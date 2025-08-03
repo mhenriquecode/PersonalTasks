@@ -54,18 +54,25 @@ class DeletedTasksActivity : AppCompatActivity(), OnTaskClickListener {
     }
 
     override fun onEditTaskMenuItemClick(position: Int) {
-        // Reativar Tarefa
         val task = deletedTasks[position]
-        task.isDeleted = false // Marca como não excluída
-        controller.updateTask(task) { success -> // Atualiza no Firestore
+        task.isDeleted = false // Marca como ativa
+
+        // Remove da lista local imediatamente para melhor feedback visual
+        deletedTasks.removeAt(position)
+        adapter.notifyItemRemoved(position)
+
+        controller.updateTask(task) { success ->
             if (success) {
                 Toast.makeText(this, "Tarefa reativada com sucesso!", Toast.LENGTH_SHORT).show()
-                loadDeletedTasks() // Recarrega a lista para refletir a mudança
             } else {
                 Toast.makeText(this, "Erro ao reativar tarefa.", Toast.LENGTH_SHORT).show()
+                // Caso falhe, reverte visualmente
+                deletedTasks.add(position, task)
+                adapter.notifyItemInserted(position)
             }
         }
     }
+
 
     override fun onRemoveTaskMenuItemClick(position: Int) {
         val taskToRemove = deletedTasks[position]
