@@ -3,6 +3,7 @@ Aplicativo Android para anotação e manipulação de tarefas pessoais.
 
 ## Funcionalidades
 
+- Sistema de Login e Logout.
 - Adicionar novas tarefas com título, descrição, data limite e detalhes.
 - Listar todas as tarefas cadastradas ordenadas por data.
 - Editar tarefas.
@@ -10,6 +11,7 @@ Aplicativo Android para anotação e manipulação de tarefas pessoais.
 - Visualizar detalhes de uma tarefa.
 - Menu para criação de novas tarefas.
 - Menu de contexto para editar, excluir e visualizar detalhes de uma tarefa a partir de um clique longo em uma tarefa já existente.
+- Menu de contexto para excluir permanentemente as tarefas já excluidas ou reativalas.
 
 ## Requisitos Mínimos
 
@@ -25,8 +27,10 @@ Aplicativo Android para anotação e manipulação de tarefas pessoais.
 
 ## Como Utilizar
 
+- Registre-se ou autentique uma conta já criada no sistema de Login na Tela Inicial.
 - O App inicia na tela principal com todas as tarefas cadastradas já listadas.
 - Para criar uma nova tarefa, clique no símbolo "+" no canto superior direito da tela.
+- Para efetuar o Logout e voltar para tela de Login, clique no botão de três pontos ao lado do símbolo "+". 
 - Clicando no símbolo, você será direcionado à tela de criação de tarefas, podendo anotar nome da tarefa, data limite, descrição da tarefa e seus detalhes.
 - Caso queira salvar esta tarefa, clique no botão "Salvar" no canto inferior direito. Assim que clicar no botão, será redirecionado com a tarefa já cadastrada na tela principal.
 - Caso não queira salvar esta tarefa, clique em "Cancelar" no canto inferior esquerdo. Assim que clicar no botão, será redirecionado com a tarefa não sendo cadastrada na tela principal.
@@ -34,7 +38,8 @@ Aplicativo Android para anotação e manipulação de tarefas pessoais.
 - **Editar task**: você poderá editar qualquer campo da tarefa selecionada.
 - **Remover task**: a tarefa será excluída imediatamente.
 - **Detalhes**: você poderá visualizar tudo da tarefa, incluindo os seus detalhes.
-
+- Caso opte por excluir a tarefa e queira reativa-la, clique em "Ver Tarefas Excluidas", o aplicativo redicionará para a tela de Tarefas Excluidas.
+- Na tela de tarefas excluidas, utilizando um clique longo, voce poderá escolher entre Reativar tarefa, Excluir permanentemente a tarefa ou exibir detalhes da tarefa. 
 ## Video de Exemplo
 
 https://github.com/user-attachments/assets/4d6315b2-1e40-4cfb-81b4-0d283fc81ccc
