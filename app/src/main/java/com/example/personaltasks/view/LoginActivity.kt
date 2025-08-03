@@ -57,6 +57,14 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this, "Erro ao criar conta: ${it.message}", Toast.LENGTH_LONG).show()
                 }
         }
+
+    }
+    override fun onStart() {
+        super.onStart()
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
     }
 
 }
