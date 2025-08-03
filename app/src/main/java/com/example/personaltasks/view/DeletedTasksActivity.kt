@@ -10,6 +10,8 @@ import com.example.personaltasks.databinding.ActivityDeletedTasksBinding
 import com.example.personaltasks.model.Constant
 import com.example.personaltasks.model.Task
 import android.app.Activity
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 
 class DeletedTasksActivity : AppCompatActivity(), OnTaskClickListener {
@@ -38,7 +40,9 @@ class DeletedTasksActivity : AppCompatActivity(), OnTaskClickListener {
 
     override fun onResume() {
         super.onResume()
-        loadDeletedTasks() // Carrega tarefas excluídas
+        Handler(Looper.getMainLooper()).postDelayed({
+            loadDeletedTasks()
+        }, 400) // delay de 400ms
     }
 
     private fun loadDeletedTasks() {

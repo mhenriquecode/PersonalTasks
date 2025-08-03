@@ -132,18 +132,23 @@ class MainActivity : AppCompatActivity(), OnTaskClickListener {
 
     override fun onRemoveTaskMenuItemClick(position: Int) {
         val taskToRemove = taskList[position]
-        // Usa o firestoreId para a remoção lógica (marcar como isDeleted)
-        taskToRemove.firestoreId?.let { firestoreId ->
+        taskList.removeAt(position)
+        taskAdapter.notifyItemRemoved(position) // feedback imediato
+
+        taskToRemove.firestoreId?.let {
             mainController.removeTask(taskToRemove) { success ->
                 if (success) {
                     Toast.makeText(this, "Tarefa movida para a lixeira!", Toast.LENGTH_SHORT).show()
-                    loadTasks() // Recarrega a lista para atualizar a UI
                 } else {
                     Toast.makeText(this, "Erro ao mover tarefa para lixeira.", Toast.LENGTH_SHORT).show()
+                    // Reinsere caso falhe
+                    taskList.add(position, taskToRemove)
+                    taskAdapter.notifyItemInserted(position)
                 }
             }
         } ?: Toast.makeText(this, "Erro: ID do Firestore nulo para remoção.", Toast.LENGTH_SHORT).show()
     }
+
 
     override fun onDetailsTaskMenuItemClick(position: Int) {
         val intent = Intent(this, TaskActivity::class.java).apply {
