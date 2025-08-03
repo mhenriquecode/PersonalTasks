@@ -54,20 +54,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <CheckBox
-        android:id="@+id/etIsDone"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Tarefa está feita?"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#AAAAAA"
-        android:background="@drawable/bg_edittext_dark"
-        android:padding="12dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/btnCancel"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <!-- Detalhes -->
     <EditText
         android:id="@+id/etDetails"

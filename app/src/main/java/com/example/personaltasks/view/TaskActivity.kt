@@ -42,7 +42,6 @@ class TaskActivity : AppCompatActivity() {
             binding.etDescription.setText(selectedTask!!.description)
             binding.etDeadline.setText(selectedTask!!.deadline)
             binding.etDetails.setText(selectedTask!!.details)
-            binding.etIsDone.isChecked = selectedTask!!.isDone
         }
 
         if (isViewMode) {
@@ -51,7 +50,6 @@ class TaskActivity : AppCompatActivity() {
             binding.etDescription.isEnabled = false
             binding.etDeadline.isEnabled = false
             binding.etDetails.isEnabled = false
-            binding.etIsDone.isEnabled = false
             binding.btnSave.visibility = android.view.View.GONE // Esconde o botão Salvar
             binding.btnCancel.text = "Voltar" // Muda o texto para Voltar
         }
@@ -96,7 +94,6 @@ class TaskActivity : AppCompatActivity() {
         val description = binding.etDescription.text.toString().trim()
         val deadline = binding.etDeadline.text.toString().trim()
         val details = binding.etDetails.text.toString().trim()
-        val isDone = binding.etIsDone.isChecked
 
         if (title.isEmpty() || description.isEmpty() || deadline.isEmpty()) {
             Toast.makeText(this, "Por favor, preencha Título, Descrição e Data.", Toast.LENGTH_SHORT).show()
@@ -109,7 +106,6 @@ class TaskActivity : AppCompatActivity() {
         taskToSave.description = description
         taskToSave.deadline = deadline
         taskToSave.details = details
-        taskToSave.isDone = isDone
         // isDeleted não é manipulado nesta tela
 
         val resultIntent = Intent().apply {
