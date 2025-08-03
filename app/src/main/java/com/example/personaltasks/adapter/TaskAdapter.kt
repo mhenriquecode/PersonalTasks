@@ -35,6 +35,7 @@ class TaskAdapter(private val taskList: List<Task>,
                     // Encontra os itens do novo menu
                     val reactivateTaskItem = menu.findItem(R.id.reactivate_task)
                     val detailsTaskDeletedItem = menu.findItem(R.id.details_task_deleted)
+                    val deletePermanentlyTaskItem = menu.findItem(R.id.delete_permanently_task)
 
                     // Define os listeners para os itens do novo menu
                     reactivateTaskItem.setOnMenuItemClickListener {
@@ -43,6 +44,10 @@ class TaskAdapter(private val taskList: List<Task>,
                     }
                     detailsTaskDeletedItem.setOnMenuItemClickListener {
                         onTaskClickListener.onDetailsTaskMenuItemClick(adapterPosition)
+                        true
+                    }
+                    deletePermanentlyTaskItem.setOnMenuItemClickListener {
+                        onTaskClickListener.onRemoveTaskMenuItemClick(adapterPosition) // Reutilizamos onRemove para exclusão permanente
                         true
                     }
 
